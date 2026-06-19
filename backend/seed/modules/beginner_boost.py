@@ -1,15 +1,140 @@
-"""BEGINNER BOOST (Beginner Fitness) — original module from fitness_database.docx.
+"""Beginner Fitness (Not Seeing Results) — original module from fitness_database.docx.
 
-Acts as the default foundational fallback when no other module is selected.
-
-CONTENT PENDING: see seed/modules/pcos.py for the stub policy.
+Auto-generated from /tmp/fitness_database.docx by scripts/import_docx.py.
+Every row below traces to a row in the source DOCX. No content invented.
 """
-from models.module import Module
+from models.module import (
+    Emotion,
+    ExerciseAvoid,
+    ExerciseRecommended,
+    FAQ,
+    FailedSolution,
+    Habit,
+    MealIdea,
+    ModuleConstraint,
+    NutritionTarget,
+    PlateauAction,
+    PsychologyThought,
+    RootCause,
+    TrackerColumn,
+    Module,
+)
 
 
 MODULE = Module(
     slug="beginner_boost",
-    display_name="Beginner Boost",
+    display_name="Beginner Fitness (Not Seeing Results)",
+    audience="Beginners aged 18-35, starting fitness journey (6+ months)",
+    primary_goal="Visible fat loss + muscle gain + confidence",
+    main_barrier="No progress despite effort; conflicting advice; confusion",
+    pain_level=8,
+    urgency=8,
     is_authored_extension=False,
-    content_pending=True,
+    content_pending=False,
+    emotions=[
+    Emotion(emotion="Frustration", exact_phrase="Working out but not seeing results", sort_order=1),
+    Emotion(emotion="Confusion", exact_phrase="doing random workouts", sort_order=2),
+    Emotion(emotion="Confusion", exact_phrase="constantly changing workouts", sort_order=3),
+    Emotion(emotion="Confusion", exact_phrase="not eating right", sort_order=4),
+    Emotion(emotion="Confusion", exact_phrase="nutrition inconsistent", sort_order=5),
+    Emotion(emotion="Overwhelm", exact_phrase="overthinking, confusion, feeling like wasting time", sort_order=6),
+    Emotion(emotion="Self-Doubt", exact_phrase="am I broken?", sort_order=7),
+    Emotion(emotion="Embarrassment", exact_phrase="embarrassment comparing to others", sort_order=8),
+    Emotion(emotion="Fear", exact_phrase="fear of quitting", sort_order=9),
+    Emotion(emotion="Frustration", exact_phrase="No progress despite effort", sort_order=10),
+    Emotion(emotion="Confusion", exact_phrase="too many conflicting advice", sort_order=11),
+    Emotion(emotion="Confusion", exact_phrase="don't know what to do next", sort_order=12),
+    Emotion(emotion="Frustration", exact_phrase="feel like wasting time at gym", sort_order=13),
+],
+    failed_solutions=[
+    FailedSolution(solution_tried="Random Instagram workouts", why_it_failed="No structure; not progressive; confusing", sort_order=1),
+    FailedSolution(solution_tried="YouTube chaos", why_it_failed="Too many options; no clear plan; overwhelming", sort_order=2),
+    FailedSolution(solution_tried="Changing programs weekly", why_it_failed="No progressive overload; never gives results", sort_order=3),
+    FailedSolution(solution_tried="Calorie counting without structure", why_it_failed="Nutrition not integrated; confusing; no progress", sort_order=4),
+    FailedSolution(solution_tried="Generic fitness apps", why_it_failed="No personalized progression; random workouts", sort_order=5),
+    FailedSolution(solution_tried="Beginner gym classes", why_it_failed="Variable quality; not personalized", sort_order=6),
+    FailedSolution(solution_tried="Free YouTube programs", why_it_failed="No progression; random; nutrition missing", sort_order=7),
+],
+    root_causes=[
+    RootCause(category="Lifestyle", root_cause="No clear progression plan", sort_order=1),
+    RootCause(category="Lifestyle", root_cause="Random workouts (no progressive overload)", sort_order=2),
+    RootCause(category="Lifestyle", root_cause="Nutrition not integrated with fitness", sort_order=3),
+    RootCause(category="Psychological", root_cause="Overthinking", sort_order=4),
+    RootCause(category="Psychological", root_cause="Confusion", sort_order=5),
+    RootCause(category="Psychological", root_cause="Self-doubt", sort_order=6),
+    RootCause(category="Psychological", root_cause="Fear of quitting", sort_order=7),
+    RootCause(category="Psychological", root_cause="Embarrassment comparing to others", sort_order=8),
+    RootCause(category="Knowledge", root_cause="Don't know what to do next", sort_order=9),
+    RootCause(category="Knowledge", root_cause="Too many conflicting advice", sort_order=10),
+    RootCause(category="Knowledge", root_cause="No personalized guidance", sort_order=11),
+],
+    nutrition_targets=[
+    NutritionTarget(field_name="Field", field_value="Details", sort_order=1),
+    NutritionTarget(field_name="Protein Target", field_value="100-120g per day", sort_order=2),
+    NutritionTarget(field_name="Fiber Target", field_value="25-35g per day", sort_order=3),
+    NutritionTarget(field_name="Carb Strategy", field_value="Moderate, focus on complex carbs", sort_order=4),
+    NutritionTarget(field_name="Fat Strategy", field_value="Moderate healthy fats", sort_order=5),
+    NutritionTarget(field_name="Meal Timing", field_value="3 meals + 1 snack; consistent", sort_order=6),
+    NutritionTarget(field_name="Simplicity", field_value="Easy meals; no elaborate prep", sort_order=7),
+],
+    meal_ideas=[
+    MealIdea(meal_time="Breakfast", diet_type="vegetarian", meal_option="Paneer bhurji + 2 rotis", sort_order=1),
+    MealIdea(meal_time="Breakfast", diet_type="non_vegetarian", meal_option="Eggs + 2 rotis + Spinach", sort_order=2),
+    MealIdea(meal_time="Lunch", diet_type="vegetarian", meal_option="Moong dal + Brown rice + Sabzi", sort_order=3),
+    MealIdea(meal_time="Lunch", diet_type="non_vegetarian", meal_option="Chicken curry + Quinoa", sort_order=4),
+    MealIdea(meal_time="Dinner", diet_type="vegetarian", meal_option="Tofu stir-fry + Roti + Dal", sort_order=5),
+    MealIdea(meal_time="Dinner", diet_type="non_vegetarian", meal_option="Fish grilled + Sweet potato", sort_order=6),
+    MealIdea(meal_time="Snacks", diet_type="vegetarian", meal_option="Greek yogurt + Berries, Almonds", sort_order=7),
+    MealIdea(meal_time="Snacks", diet_type="non_vegetarian", meal_option="Protein shake, Eggs", sort_order=8),
+],
+    exercises_recommended=[
+    ExerciseRecommended(exercise_type="Walking", frequency="Daily", duration="20-30 min", benefits="Foundation; builds habit", sort_order=1),
+    ExerciseRecommended(exercise_type="Strength Training", frequency="3x/week", duration="30 min", benefits="Progressive overload; results", sort_order=2),
+    ExerciseRecommended(exercise_type="Yoga", frequency="2x/week", duration="15 min", benefits="Flexibility; recovery", sort_order=3),
+    ExerciseRecommended(exercise_type="Bodyweight Circuits", frequency="3x/week", duration="20 min", benefits="Beginner-friendly; no equipment", sort_order=4),
+],
+    exercises_avoid=[
+    ExerciseAvoid(exercise_type="Random Instagram workouts", why_avoid="No structure; no progression", sort_order=1),
+    ExerciseAvoid(exercise_type="Changing programs weekly", why_avoid="No progressive overload", sort_order=2),
+    ExerciseAvoid(exercise_type="HIIT (too early)", why_avoid="Too intense for beginners", sort_order=3),
+    ExerciseAvoid(exercise_type="60-min classes", why_avoid="Too long; overwhelming", sort_order=4),
+],
+    constraints=[
+    ModuleConstraint(constraint_name="Home Workout", solution="No equipment needed", approach="Body squats, Push-ups, Glute bridges, Plank", sort_order=1),
+    ModuleConstraint(constraint_name="Gym Workout", solution="Full equipment", approach="Goblet squats, Dumbbell rows, Machine work", sort_order=2),
+    ModuleConstraint(constraint_name="Confusion", solution="Clear progression plan", approach="Follow Week 1-4 exactly; no changes", sort_order=3),
+    ModuleConstraint(constraint_name="No Time", solution="15-min version", approach="Beginner routine = 15 min", sort_order=4),
+    ModuleConstraint(constraint_name="Self-Doubt", solution="Trainer-designed", approach="Follow proven plan; track progress", sort_order=5),
+],
+    habits=[
+    Habit(habit_name="Workout", daily_target="3x/week (30 min)", how_to_track="Calendar / app", sort_order=1),
+    Habit(habit_name="Protein", daily_target="100-120g", how_to_track="Food tracker", sort_order=2),
+    Habit(habit_name="Water", daily_target="2-3 liters", how_to_track="Water bottle", sort_order=3),
+    Habit(habit_name="Sleep", daily_target="7-8 hours", how_to_track="Sleep app", sort_order=4),
+    Habit(habit_name="Steps", daily_target="6,000 steps", how_to_track="Step counter", sort_order=5),
+],
+    psychology_thoughts=[
+    PsychologyThought(common_thought="I'm broken.", solution='Education: "Beginners need progression, not random workouts"', sort_order=1),
+    PsychologyThought(common_thought="I always fail.", solution="Follow 30-day plan; track progress weekly", sort_order=2),
+    PsychologyThought(common_thought="I don't know what to do.", solution="Clear Week 1-4 plan; no confusion", sort_order=3),
+    PsychologyThought(common_thought="I'm wasting time.", solution="Progressive overload tracked; visible results", sort_order=4),
+],
+    plateau_actions=[
+    PlateauAction(trigger_condition="No results (2+ weeks)", action_to_take="Increase protein by 10g", sort_order=1),
+    PlateauAction(trigger_condition="No results (2+ weeks)", action_to_take="Add 1,000 steps/day", sort_order=2),
+    PlateauAction(trigger_condition="No results (4+ weeks)", action_to_take="Reassess calorie intake", sort_order=3),
+],
+    faqs=[
+    FAQ(question="Why am I not seeing results?", answer="Random workouts + no progression = no results. Need progressive overload plan.", sort_order=1),
+    FAQ(question="How often should I workout?", answer="3x/week strength training, daily walking, 2x/week yoga.", sort_order=2),
+    FAQ(question="Do I need gym equipment?", answer="No. Home option: bodyweight only. Gym option: dumbbells.", sort_order=3),
+    FAQ(question="Will I see results in 30 days?", answer="Yes, if following progressive plan consistently.", sort_order=4),
+],
+    tracker_columns=[
+    TrackerColumn(column_name="Weight", sort_order=1),
+    TrackerColumn(column_name="Photos", sort_order=2),
+    TrackerColumn(column_name="Energy (1-10)", sort_order=3),
+    TrackerColumn(column_name="Strength Progress", sort_order=4),
+    TrackerColumn(column_name="Notes", sort_order=5),
+],
 )

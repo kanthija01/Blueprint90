@@ -60,6 +60,7 @@ class Collections:
     MODULES = "modules"
     MODULE_FALLBACK_MAP = "module_fallback_map"
     USERS = "users"
+    USER_SESSIONS = "user_sessions"
     ASSESSMENTS = "assessments"
     ASSESSMENT_MODULE_SELECTIONS = "assessment_module_selections"
     BLUEPRINTS = "blueprints"

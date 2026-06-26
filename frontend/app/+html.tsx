@@ -18,6 +18,11 @@ export default function Root({ children }: PropsWithChildren) {
           set `overflow: auto` on the body style below.
         */}
         <ScrollViewStyleReset />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var h=window.location.href,m=h.match(/[?#&]session_id=([^&#]+)/);if(m)sessionStorage.setItem("bp90.oauth_session_id",decodeURIComponent(m[1]));}catch(e){}})();`,
+          }}
+        />
         <style
           dangerouslySetInnerHTML={{
             __html: `

@@ -37,3 +37,7 @@ yarn-error.*
 *.tsbuildinfo
 
 app-example
+frontend/.metro-cache/
+frontend/node_modules/
+backend/.mongo-data/
+*.log

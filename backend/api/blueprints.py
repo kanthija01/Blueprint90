@@ -1,4 +1,5 @@
-"""GET /api/blueprints, GET /api/blueprints/{id}, GET /api/blueprints/{id}/selections.
+"""GET /api/blueprints, GET /api/blueprints/{id}, GET /api/blueprints/{id}/pdf,
+GET /api/blueprints/{id}/selections.
 
 All routes return ONLY documents owned by the authenticated user. Any other
 blueprint id returns 404 — we don't leak existence of someone else's record.
@@ -10,9 +11,11 @@ Mongo and never re-runs assembly. This is enforced by the test
 """
 from __future__ import annotations
 
+import logging
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import FileResponse
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from auth.dependencies import get_current_user, get_db_dep
@@ -23,9 +26,11 @@ from models.api import (
 )
 from models.blueprint import AssembledBlueprint
 from models.user import User
+from pdf.generate import blueprint_pdf_path, generate_blueprint_pdf
 from rules_engine.types import ModuleSelection
 
 router = APIRouter(prefix="/blueprints", tags=["blueprints"])
+logger = logging.getLogger(__name__)
 
 
 @router.get("", response_model=List[BlueprintListItem])
@@ -68,7 +73,8 @@ async def get_blueprint(
     current: User = Depends(get_current_user),
     db: AsyncIOMotorDatabase = Depends(get_db_dep),
 ):
-    """Return ONLY the cached assembled_json. Never re-runs assembly."""
+    """Return ONLY the cached assembled_json. Never re-runs assembly.
+    Requires a paid payment record linked to this blueprint."""
     doc = await db[Collections.BLUEPRINTS].find_one(
         {"blueprint_id": blueprint_id, "user_id": current.user_id},
         {"_id": 0, "assembled_json": 1},
@@ -78,7 +84,75 @@ async def get_blueprint(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Blueprint not found",
         )
+
+    paid = await db[Collections.PAYMENTS].find_one(
+        {
+            "blueprint_id": blueprint_id,
+            "user_id": current.user_id,
+            "status": "paid",
+        },
+        {"_id": 1},
+    )
+    if not paid:
+        logger.warning(
+            "[blueprint] access denied (no paid payment): blueprint_id=%s user=%s",
+            blueprint_id,
+            current.user_id,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_402_PAYMENT_REQUIRED,
+            detail="Payment required to view this blueprint",
+        )
+
+    logger.info(
+        "[blueprint] access granted: blueprint_id=%s user=%s",
+        blueprint_id,
+        current.user_id,
+    )
     return doc["assembled_json"]
+
+
+@router.get("/{blueprint_id}/pdf")
+async def get_blueprint_pdf(
+    blueprint_id: str,
+    current: User = Depends(get_current_user),
+    db: AsyncIOMotorDatabase = Depends(get_db_dep),
+):
+    """Return the cached PDF or generate it from assembled_json (never re-assembles)."""
+    doc = await db[Collections.BLUEPRINTS].find_one(
+        {"blueprint_id": blueprint_id, "user_id": current.user_id},
+        {"_id": 0, "assembled_json": 1},
+    )
+    if not doc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Blueprint not found",
+        )
+
+    paid = await db[Collections.PAYMENTS].find_one(
+        {
+            "blueprint_id": blueprint_id,
+            "user_id": current.user_id,
+            "status": "paid",
+        },
+        {"_id": 1},
+    )
+    if not paid:
+        raise HTTPException(
+            status_code=status.HTTP_402_PAYMENT_REQUIRED,
+            detail="Payment required",
+        )
+
+    pdf_path = blueprint_pdf_path(blueprint_id)
+    if not pdf_path.is_file():
+        assembled = AssembledBlueprint(**doc["assembled_json"])
+        generate_blueprint_pdf(assembled, output_path=pdf_path)
+
+    return FileResponse(
+        path=str(pdf_path),
+        media_type="application/pdf",
+        filename=f"blueprint-{blueprint_id}.pdf",
+    )
 
 
 @router.get(

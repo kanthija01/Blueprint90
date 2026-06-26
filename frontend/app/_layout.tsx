@@ -5,9 +5,13 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native";
 
+import { captureWebOAuthSession } from "@/src/lib/emergent-auth";
 import { useIconFonts } from "@/src/hooks/use-icon-fonts";
 import { useAuthStore } from "@/src/stores/auth";
 import { colors } from "@/src/theme";
+
+// Stash OAuth session_id before expo-router can strip query params.
+captureWebOAuthSession();
 
 SplashScreen.preventAutoHideAsync();
 
@@ -17,6 +21,7 @@ export default function RootLayout() {
   const status = useAuthStore((s) => s.status);
 
   useEffect(() => {
+    console.log("[auth] root layout calling bootstrap()");
     void bootstrap();
   }, [bootstrap]);
 

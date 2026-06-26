@@ -83,7 +83,8 @@ export function StepReview({
           Looks good?
         </Text>
         <Text variant="body" color={colors.textMuted}>
-          Tap any card to fix it. Everything is deterministic — no AI, no guessing.
+          Tap any card to fix it. Once you continue, payment opens and your
+          blueprint is generated after confirmation.
         </Text>
       </View>
 
@@ -125,7 +126,7 @@ export function StepReview({
       <View style={styles.cta}>
         <Button
           testID="submit-assessment"
-          label="Generate my Blueprint"
+          label="Continue to Payment"
           fullWidth
           onPress={onSubmit}
           loading={submitting}

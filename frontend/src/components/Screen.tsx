@@ -32,18 +32,6 @@ export function Screen({
   contentContainerStyle,
   testID,
 }: Props) {
-  const inner = (
-    <View
-      style={[
-        styles.inner,
-        padded && styles.padded,
-        contentContainerStyle,
-      ]}
-    >
-      {children}
-    </View>
-  );
-
   return (
     <SafeAreaView style={styles.safe} edges={edges} testID={testID}>
       <StatusBar style="light" />
@@ -54,14 +42,26 @@ export function Screen({
         {scroll ? (
           <ScrollView
             style={styles.flex}
-            contentContainerStyle={styles.scrollContent}
+            contentContainerStyle={[
+              styles.scrollContent,
+              padded && styles.padded,
+              contentContainerStyle,
+            ]}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
-            {inner}
+            {children}
           </ScrollView>
         ) : (
-          inner
+          <View
+            style={[
+              styles.inner,
+              padded && styles.padded,
+              contentContainerStyle,
+            ]}
+          >
+            {children}
+          </View>
         )}
       </KeyboardAvoidingView>
     </SafeAreaView>

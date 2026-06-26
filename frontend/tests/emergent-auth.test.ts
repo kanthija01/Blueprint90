@@ -10,6 +10,26 @@ import { describe, test } from "node:test";
 // top level which we cannot load in Node.
 function parseSessionId(url: string): string | null {
   try {
+    const parsed = new URL(url);
+    const fromQuery =
+      parsed.searchParams.get("session_id") ??
+      parsed.searchParams.get("sessionId");
+    if (fromQuery) return fromQuery;
+
+    const hash = parsed.hash.startsWith("#") ? parsed.hash.slice(1) : parsed.hash;
+    if (hash) {
+      const hashQueryStart = hash.indexOf("?");
+      const hashPart = hashQueryStart >= 0 ? hash.slice(hashQueryStart + 1) : hash;
+      const hashParams = new URLSearchParams(hashPart);
+      const fromHash =
+        hashParams.get("session_id") ?? hashParams.get("sessionId");
+      if (fromHash) return fromHash;
+    }
+  } catch {
+    // fall through
+  }
+
+  try {
     const hashIdx = url.indexOf("#");
     const qIdx = url.indexOf("?");
     const fragments: string[] = [];
@@ -20,7 +40,7 @@ function parseSessionId(url: string): string | null {
       );
     for (const frag of fragments) {
       const params = new URLSearchParams(frag);
-      const sid = params.get("session_id");
+      const sid = params.get("session_id") ?? params.get("sessionId");
       if (sid) return sid;
     }
   } catch {
@@ -42,11 +62,22 @@ describe("emergent auth: parseSessionId", () => {
       "xyz789",
     );
   });
-  test("prefers hash over query when both exist", () => {
-    // Both present: implementation queues hash first, so hash wins.
+  test("prefers query when both query and hash session_id exist", () => {
     assert.equal(
       parseSessionId("https://app.example/?session_id=q#session_id=h"),
-      "h",
+      "q",
+    );
+  });
+  test("reads sessionId camelCase alias", () => {
+    assert.equal(
+      parseSessionId("https://app.example/?sessionId=camel01"),
+      "camel01",
+    );
+  });
+  test("reads from hash route query", () => {
+    assert.equal(
+      parseSessionId("https://app.example/#/?session_id=hashroute"),
+      "hashroute",
     );
   });
   test("returns null when missing", () => {

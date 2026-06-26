@@ -1,4 +1,5 @@
-// POST /api/assessments — the single endpoint that drives the whole funnel.
+// POST /api/assessments — submits the assessment after payment is confirmed.
+// The backend verifies the payment_id is paid before generating the blueprint.
 
 import { apiRequest } from "./client";
 import type {
@@ -12,6 +13,9 @@ import type {
 } from "@/src/lib/constants";
 
 export type AssessmentPayload = {
+  // Payment verification — must reference a paid pre-assessment payment.
+  payment_id: string;
+  // Assessment fields
   age: number;
   gender: Gender;
   height_cm: number;
@@ -25,12 +29,10 @@ export type AssessmentPayload = {
   biggest_struggle: string;
 };
 
-// The returned `assembled_json` is the full blueprint. Phase 4 only needs
-// the IDs for navigation; preview rendering arrives in Phase 5.
+// assembled_json is no longer returned — client fetches via GET /api/blueprints/{id}.
 export type AssessmentResponse = {
   blueprint_id: string;
   assessment_id: string;
-  assembled_json: Record<string, unknown>;
 };
 
 export function submitAssessment(

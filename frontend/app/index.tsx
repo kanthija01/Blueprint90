@@ -1,8 +1,8 @@
 // Landing screen. Public. Routes the user based on auth state once mounted.
 // While auth is bootstrapping we show a subtle splash-styled state.
 
-import { useEffect } from "react";
-import { Platform, StyleSheet, View } from "react-native";
+import { useEffect, useRef } from "react";
+import { Platform, Pressable, StyleSheet, View } from "react-native";
 import { Redirect, useRouter } from "expo-router";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 
@@ -17,38 +17,60 @@ import { colors, spacing } from "@/src/theme";
 export default function LandingScreen() {
   const router = useRouter();
   const status = useAuthStore((s) => s.status);
+  const authError = useAuthStore((s) => s.error);
   const loginWithSessionId = useAuthStore((s) => s.loginWithSessionId);
+  const oauthHandled = useRef(false);
+
+  useEffect(() => {
+    console.log("[auth] index status:", status);
+  }, [status]);
 
   // Web: detect ?session_id / #session_id on first paint and complete login.
   // Mobile: also check the initial deep link in case a sign-in was launched
   // before the app was running.
   useEffect(() => {
-    let cancelled = false;
+    if (oauthHandled.current) return;
+
     const run = async () => {
       const sid =
         Platform.OS === "web"
           ? readWebSessionIdFromUrl()
           : await readInitialDeepLinkSessionId();
-      if (!sid || cancelled) return;
+
+      if (!sid) {
+        console.log("[auth] index no session_id found — skipping login");
+        return;
+      }
+
+      oauthHandled.current = true;
+      console.log("[auth] index session_id found, calling loginWithSessionId");
+
       try {
         await loginWithSessionId(sid);
-      } catch {
-        // already surfaced via store.error
+        console.log("[auth] index router.replace(/dashboard)");
+        router.replace("/dashboard");
+      } catch (e) {
+        console.log("[auth] index login failed:", (e as Error).message);
+        oauthHandled.current = false;
       }
     };
+
     void run();
-    return () => {
-      cancelled = true;
-    };
-  }, [loginWithSessionId]);
+  }, [loginWithSessionId, router]);
 
   if (status === "authenticated") {
+    console.log("[auth] index Redirect → /dashboard");
     return <Redirect href="/dashboard" />;
   }
 
   return (
     <Screen edges={["top", "bottom"]}>
       <View style={styles.container}>
+        {authError ? (
+          <Text variant="caption" color={colors.danger} style={styles.error}>
+            Sign-in error: {authError}
+          </Text>
+        ) : null}
         <Animated.View entering={FadeInUp.duration(600)} style={styles.brand}>
           <Text variant="overline" color={colors.primary}>
             BLUEPRINT 90
@@ -99,6 +121,38 @@ export default function LandingScreen() {
             By continuing you agree to a deterministic, content-driven plan.
           </Text>
         </Animated.View>
+
+        {/* Footer — legal links required for Razorpay live activation */}
+        <View style={styles.footer}>
+          <View style={styles.footerLinks}>
+            <Pressable onPress={() => router.push("/contact" as never)}>
+              <Text variant="caption" color={colors.textDim} style={styles.footerLink}>
+                Contact
+              </Text>
+            </Pressable>
+            <Text variant="caption" color={colors.textDim}>·</Text>
+            <Pressable onPress={() => router.push("/privacy" as never)}>
+              <Text variant="caption" color={colors.textDim} style={styles.footerLink}>
+                Privacy Policy
+              </Text>
+            </Pressable>
+            <Text variant="caption" color={colors.textDim}>·</Text>
+            <Pressable onPress={() => router.push("/terms" as never)}>
+              <Text variant="caption" color={colors.textDim} style={styles.footerLink}>
+                Terms &amp; Conditions
+              </Text>
+            </Pressable>
+            <Text variant="caption" color={colors.textDim}>·</Text>
+            <Pressable onPress={() => router.push("/refund" as never)}>
+              <Text variant="caption" color={colors.textDim} style={styles.footerLink}>
+                Refund Policy
+              </Text>
+            </Pressable>
+          </View>
+          <Text variant="caption" color={colors.textDim} align="center" style={styles.copyright}>
+            © {new Date().getFullYear()} Blueprint 90. All rights reserved.
+          </Text>
+        </View>
       </View>
     </Screen>
   );
@@ -114,4 +168,25 @@ const styles = StyleSheet.create({
   spacer: { flex: 1, minHeight: spacing.xxxl },
   cta: { gap: spacing.md, marginBottom: spacing.lg },
   legal: { marginTop: spacing.sm },
+  error: { marginBottom: spacing.md },
+  footer: {
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: colors.divider,
+    gap: spacing.sm,
+  },
+  footerLinks: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: spacing.sm,
+  },
+  footerLink: {
+    textDecorationLine: "underline",
+  },
+  copyright: {
+    marginTop: spacing.xs,
+  },
 });

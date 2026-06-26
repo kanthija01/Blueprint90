@@ -27,13 +27,14 @@ def _mkid(prefix: str) -> str:
 # ---------- POST /api/assessments ---------------------------------------
 class AssessmentRequest(Assessment):
     """Same shape as the rules-engine `Assessment`, used as the FastAPI
-    request body so validation is single-sourced."""
+    request body so validation is single-sourced.
+    `payment_id` must reference a *paid* pre-assessment payment record."""
+    payment_id: str
 
 
 class AssessmentResponse(BaseModel):
     blueprint_id: str
     assessment_id: str
-    assembled_json: AssembledBlueprint
 
 
 # ---------- Persisted documents ----------------------------------------
@@ -82,6 +83,44 @@ class BlueprintSelectionsResponse(BaseModel):
     blueprint_id: str
     assessment_id: str
     selections: List[ModuleSelection]
+
+
+# ---------- POST /api/payments/create-pre-assessment-order --------------
+class CreatePreAssessmentOrderResponse(BaseModel):
+    payment_id: str
+    razorpay_order_id: str
+    amount: int
+    currency: str
+    key_id: str
+
+
+# ---------- POST /api/payments/create-order (legacy PDF unlock) ----------
+class CreateOrderRequest(BaseModel):
+    blueprint_id: str
+
+
+class CreateOrderResponse(BaseModel):
+    payment_id: str
+    razorpay_order_id: str
+    amount: int
+    currency: str
+    key_id: str
+
+
+class PaymentRecord(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    payment_id: str = Field(default_factory=lambda: _mkid("pay"))
+    user_id: str
+    # blueprint_id is None for pre-assessment payments; set after generation.
+    blueprint_id: Optional[str] = None
+    razorpay_order_id: Optional[str] = None
+    razorpay_payment_id: Optional[str] = None
+    amount_paise: int
+    currency: str = "INR"
+    status: str  # "created" | "paid"
+    created_at: datetime = Field(default_factory=_now)
+    updated_at: Optional[datetime] = None
 
 
 # ---------- GET /api/modules -------------------------------------------

@@ -52,6 +52,13 @@ __pycache__/
 venv/
 .venv/
 
+# Generated blueprint PDFs (cached by GET /api/blueprints/{id}/pdf)
+backend/storage/blueprints/*.pdf
+!backend/storage/blueprints/.gitkeep
+
+# Local MongoDB data (dev)
+backend/.mongo-data/
+
 # Development tools
 chainlit.md
 .chainlit
@@ -75,8 +82,10 @@ agenthub/agents/youtube/db
 
 # Build caches
 .cache/
+frontend/.metro-cache/
 
 memory/test_credentials.md
 
 # Mobile development
-android-sdk/
+android-sdk/backend/.mongo-data/journal/WiredTigerLog.0000000004
+backend/.mongo-data/journal/WiredTigerPreplog.0000000001

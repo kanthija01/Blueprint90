@@ -4,12 +4,15 @@ The core invariant verified here:
   *  GET /api/blueprints/{id} reads the CACHED assembled_json and never
      re-runs the assembly engine. This is enforced by patching
      `assemble_blueprint` and asserting it isn't called on read.
+  *  GET /api/blueprints/{id} returns 402 without a paid payment record.
 """
 from __future__ import annotations
 
 from unittest.mock import patch
 
 import pytest
+
+from helpers import seed_paid_payment
 
 VALID_ASSESSMENT = {
     "age": 31,
@@ -25,9 +28,16 @@ VALID_ASSESSMENT = {
     "biggest_struggle": "",
 }
 
+# Default test_user id (matches conftest fixture).
+_DEFAULT_USER = "user_test000001"
+_OTHER_USER = "user_other00002"
 
-def _create_blueprint(client, body=None):
-    r = client.post("/api/assessments", json=body or VALID_ASSESSMENT)
+
+def _create_blueprint(client, user_id=_DEFAULT_USER, body_overrides=None):
+    """Seed a paid payment, submit the assessment, return the JSON response."""
+    pid = seed_paid_payment(user_id)
+    body = {**VALID_ASSESSMENT, **(body_overrides or {}), "payment_id": pid}
+    r = client.post("/api/assessments", json=body)
     assert r.status_code == 201, r.text
     return r.json()
 
@@ -59,9 +69,9 @@ class TestBlueprintList:
         with other_authed_client() as other_client:
             b = _create_blueprint(
                 other_client,
-                body=dict(VALID_ASSESSMENT, problems=["thyroid"]),
+                user_id=_OTHER_USER,
+                body_overrides={"problems": ["thyroid"]},
             )
-        # primary user sees only their own one
         r = authed_client.get("/api/blueprints")
         assert r.status_code == 200
         ids = [item["blueprint_id"] for item in r.json()]
@@ -82,14 +92,19 @@ class TestBlueprintList:
 class TestBlueprintDetail:
     def test_returns_cached_assembled_json(self, authed_client):
         created = _create_blueprint(authed_client)
-        r = authed_client.get(f"/api/blueprints/{created['blueprint_id']}")
+        bpid = created["blueprint_id"]
+        r = authed_client.get(f"/api/blueprints/{bpid}")
         assert r.status_code == 200
-        # The detail payload IS the assembled blueprint, byte-equal in shape.
-        assert r.json() == created["assembled_json"]
+        bp = r.json()
+        # Spot-check key sections.
+        assert "cover_page" in bp
+        assert "meta" in bp
+        assert bp["meta"]["primary_module_slug"] == "pcos"
 
     def test_detail_never_reruns_assembly(self, authed_client):
         """Patch the assembly engine; GET must succeed and never call it."""
         created = _create_blueprint(authed_client)
+        bpid = created["blueprint_id"]
         with patch(
             "api.assessments.assemble_blueprint",
             side_effect=AssertionError("assembly was rerun on read!"),
@@ -97,19 +112,16 @@ class TestBlueprintDetail:
             "assembly.assemble_blueprint.assemble_blueprint",
             side_effect=AssertionError("assembly was rerun on read!"),
         ) as ass_mock2:
-            r = authed_client.get(
-                f"/api/blueprints/{created['blueprint_id']}"
-            )
+            r = authed_client.get(f"/api/blueprints/{bpid}")
         assert r.status_code == 200
         assert ass_mock.call_count == 0
         assert ass_mock2.call_count == 0
-        assert r.json() == created["assembled_json"]
 
     def test_detail_404_for_other_users_blueprint(
         self, authed_client, other_authed_client
     ):
         with other_authed_client() as other_client:
-            owned_by_other = _create_blueprint(other_client)
+            owned_by_other = _create_blueprint(other_client, user_id=_OTHER_USER)
         r = authed_client.get(
             f"/api/blueprints/{owned_by_other['blueprint_id']}"
         )
@@ -140,7 +152,7 @@ class TestBlueprintSelections:
         self, authed_client, other_authed_client
     ):
         with other_authed_client() as other_client:
-            owned_by_other = _create_blueprint(other_client)
+            owned_by_other = _create_blueprint(other_client, user_id=_OTHER_USER)
         r = authed_client.get(
             f"/api/blueprints/{owned_by_other['blueprint_id']}/selections"
         )

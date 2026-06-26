@@ -1,0 +1,1 @@
+"""Blueprint PDF generation (ReportLab)."""

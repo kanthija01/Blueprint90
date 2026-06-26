@@ -13,8 +13,11 @@ from pathlib import Path
 
 # Make `backend/` importable from anywhere we run pytest.
 BACKEND_ROOT = Path(__file__).resolve().parent.parent
+TESTS_DIR = Path(__file__).resolve().parent
 if str(BACKEND_ROOT) not in sys.path:
     sys.path.insert(0, str(BACKEND_ROOT))
+if str(TESTS_DIR) not in sys.path:
+    sys.path.insert(0, str(TESTS_DIR))
 
 # ----- Switch to a dedicated test database BEFORE any backend module is imported.
 # core/db.py reads DB_NAME at import time; this override only affects the in-process
@@ -24,6 +27,7 @@ from dotenv import load_dotenv  # noqa: E402
 load_dotenv(BACKEND_ROOT / ".env")
 _SOURCE_DB = os.environ.get("DB_NAME", "test_database")
 os.environ["DB_NAME"] = "blueprint90_test"
+os.environ.setdefault("RAZORPAY_WEBHOOK_SECRET", "whsec_test_blueprint90_local")
 
 import pytest  # noqa: E402
 from fastapi.testclient import TestClient  # noqa: E402
@@ -69,6 +73,7 @@ def _wipe_per_test():
         Collections.ASSESSMENTS,
         Collections.ASSESSMENT_MODULE_SELECTIONS,
         Collections.BLUEPRINTS,
+        Collections.PAYMENTS,
     ):
         db[coll].delete_many({})
     yield
@@ -156,3 +161,13 @@ def other_authed_client(app, client, test_user, other_user):
                 app.dependency_overrides.pop(get_current_user, None)
 
     return _switch
+
+
+
+# ---------------------------------------------------------------------------
+# Shared test helper: seed a paid payment record and submit an assessment.
+#
+# Import `seed_paid_payment` from `tests/helpers.py` in individual test
+# modules. It is defined there (not here) so it can be imported as a regular
+# module without pytest's conftest magic interfering.
+# ---------------------------------------------------------------------------

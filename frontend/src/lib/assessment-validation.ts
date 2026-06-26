@@ -61,10 +61,14 @@ export function validateForSubmit(d: AssessmentDraft): string | null {
 }
 
 /** Convert a fully-valid draft into the API payload. Throws if invalid. */
-export function draftToPayload(d: AssessmentDraft): AssessmentPayload {
+export function draftToPayload(
+  d: AssessmentDraft,
+  paymentId: string,
+): AssessmentPayload {
   const err = validateForSubmit(d);
   if (err) throw new Error(err);
   return {
+    payment_id: paymentId,
     age: d.age!,
     gender: d.gender!,
     height_cm: d.height_cm!,

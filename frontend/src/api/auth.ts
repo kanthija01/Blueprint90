@@ -17,10 +17,14 @@ export type SessionExchangeResponse = {
 export function exchangeSession(
   sessionId: string,
 ): Promise<SessionExchangeResponse> {
+  console.log("[auth] exchangeSession request, session_id:", `${sessionId.slice(0, 8)}…`);
   return apiRequest<SessionExchangeResponse>("/api/auth/session", {
     method: "POST",
     body: { session_id: sessionId },
     unauthenticated: true,
+  }).then((res) => {
+    console.log("[auth] exchangeSession response OK, user:", res.user.user_id);
+    return res;
   });
 }
 

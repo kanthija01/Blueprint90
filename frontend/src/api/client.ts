@@ -37,6 +37,8 @@ export async function apiRequest<T>(
   opts: RequestOptions = {},
 ): Promise<T> {
   const url = `${BASE_URL}${path.startsWith("/") ? "" : "/"}${path}`;
+  console.log("[auth] apiRequest", opts.method ?? "GET", url);
+
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     Accept: "application/json",
@@ -77,6 +79,7 @@ export async function apiRequest<T>(
         : undefined) ?? res.statusText;
     const message =
       typeof detail === "string" ? detail : JSON.stringify(detail);
+    console.log("[auth] apiRequest failed", res.status, url, message);
     throw new ApiError(res.status, message, parsed);
   }
 

@@ -4,7 +4,6 @@
 import { useEffect, useRef } from "react";
 import { Platform, Pressable, StyleSheet, View } from "react-native";
 import { Redirect, useRouter } from "expo-router";
-import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 
 import { Button, Screen, Text } from "@/src/components";
 import {
@@ -71,41 +70,32 @@ export default function LandingScreen() {
             Sign-in error: {authError}
           </Text>
         ) : null}
-        <Animated.View entering={FadeInUp.duration(600)} style={styles.brand}>
+        <View style={styles.brand}>
           <Text variant="overline" color={colors.primary}>
             BLUEPRINT 90
           </Text>
-        </Animated.View>
+        </View>
 
-        <Animated.View
-          entering={FadeInDown.delay(120).duration(700)}
-          style={styles.hero}
-        >
+        <View style={styles.hero}>
           <Text variant="display" style={styles.heroLine}>
             Engineered fitness.
           </Text>
           <Text variant="display" style={styles.heroLineAccent}>
             Built for you.
           </Text>
-        </Animated.View>
+        </View>
 
-        <Animated.View
-          entering={FadeInDown.delay(280).duration(700)}
-          style={styles.copy}
-        >
+        <View style={styles.copy}>
           <Text variant="body" color={colors.textMuted}>
             A 90-day, deterministic blueprint covering training, nutrition, and
             psychology — assembled from verified modules. No AI advice. No
             guessing.
           </Text>
-        </Animated.View>
+        </View>
 
         <View style={styles.spacer} />
 
-        <Animated.View
-          entering={FadeInDown.delay(440).duration(700)}
-          style={styles.cta}
-        >
+        <View style={styles.cta}>
           <Button
             testID="start-cta"
             label="Start Your Blueprint"
@@ -120,7 +110,7 @@ export default function LandingScreen() {
           >
             By continuing you agree to a deterministic, content-driven plan.
           </Text>
-        </Animated.View>
+        </View>
 
         {/* Footer — legal links required for Razorpay live activation */}
         <View style={styles.footer}>

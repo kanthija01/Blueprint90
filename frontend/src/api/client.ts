@@ -4,10 +4,9 @@
 import { storage } from "@/src/utils/storage";
 import { STORAGE_KEYS } from "@/src/lib/constants";
 
-const BASE_URL =
-  process.env.EXPO_PUBLIC_BACKEND_URL ??
-  process.env.EXPO_PUBLIC_API_URL ??
-  "";
+// Single env var — set EXPO_PUBLIC_API_URL in your .env (local) or
+// Render / EAS dashboard (production).
+const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? "";
 
 export class ApiError extends Error {
   status: number;

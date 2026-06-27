@@ -3,7 +3,7 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "preinstall": "node ./scripts/cmd-guard.js --preinstall",
+    "preinstall": "node -e \"process.env.CI || process.env.VERCEL || require('child_process').execSync('node ./scripts/cmd-guard.js --preinstall', {stdio:'inherit'})\"",
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo start --android",

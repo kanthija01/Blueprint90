@@ -18,7 +18,6 @@ import {
   View,
 } from "react-native";
 import { useRouter } from "expo-router";
-import Animated, { FadeInRight } from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";
 
 import { ProgressBar, Screen, Text } from "@/src/components";
@@ -212,9 +211,8 @@ export default function AssessmentScreen() {
         <ProgressBar step={step} total={TOTAL_STEPS} />
       </View>
 
-      <Animated.View
+      <View
         key={step}
-        entering={FadeInRight.duration(280)}
         style={styles.stepBlock}
       >
         {step === 1 && <StepBasicInfo onNext={next} />}
@@ -226,7 +224,7 @@ export default function AssessmentScreen() {
         {step === 7 && (
           <StepReview onSubmit={handleSubmit} onEdit={setStep} />
         )}
-      </Animated.View>
+      </View>
     </Screen>
   );
 }

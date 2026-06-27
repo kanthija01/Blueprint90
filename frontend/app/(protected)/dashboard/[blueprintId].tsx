@@ -13,7 +13,6 @@ import {
   View,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import Animated, { FadeInUp } from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";
 
 import {
@@ -345,10 +344,7 @@ export default function BlueprintDetailScreen() {
         }
       >
         {/* ---- A. Cover ---- */}
-        <Animated.View
-          entering={FadeInUp.duration(400)}
-          style={styles.coverWrap}
-        >
+        <View style={styles.coverWrap}>
           <Card elevated>
             <Text variant="overline" color={colors.primary}>
               YOUR 90-DAY BLUEPRINT
@@ -392,7 +388,7 @@ export default function BlueprintDetailScreen() {
               ))}
             </View>
           </Card>
-        </Animated.View>
+        </View>
 
         {/* ---- B. Why previous attempts failed ---- */}
         <BlueprintSectionCard

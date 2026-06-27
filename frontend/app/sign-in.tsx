@@ -2,7 +2,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import { Redirect, useRouter } from "expo-router";
-import Animated, { FadeInDown } from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";
 
 import { Button, Screen, Text } from "@/src/components";
@@ -87,7 +86,7 @@ export default function SignInScreen() {
   return (
     <Screen edges={["top", "bottom"]}>
       <View style={styles.container}>
-        <Animated.View entering={FadeInDown.duration(500)}>
+        <View>
           <Text variant="overline" color={colors.primary}>
             ACCOUNT
           </Text>
@@ -98,11 +97,11 @@ export default function SignInScreen() {
             We use Google so you don&apos;t manage another password. Your data
             is private and never used to train models.
           </Text>
-        </Animated.View>
+        </View>
 
         <View style={styles.spacer} />
 
-        <Animated.View entering={FadeInDown.delay(200).duration(500)}>
+        <View>
           {error ? (
             <Text
               variant="caption"
@@ -133,7 +132,7 @@ export default function SignInScreen() {
             onPress={() => router.back()}
             style={styles.back}
           />
-        </Animated.View>
+        </View>
       </View>
     </Screen>
   );

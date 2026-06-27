@@ -8,7 +8,6 @@ import {
   View,
 } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
-import Animated, { FadeIn } from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";
 
 import { Button, Card, Screen, Text } from "@/src/components";
@@ -89,7 +88,7 @@ export default function DashboardScreen() {
           />
         }
       >
-        <Animated.View entering={FadeIn.duration(400)} style={styles.header}>
+        <View style={styles.header}>
           <Text variant="overline" color={colors.primary}>
             DASHBOARD
           </Text>
@@ -99,7 +98,7 @@ export default function DashboardScreen() {
           <Text variant="body" color={colors.textMuted}>
             {user?.email}
           </Text>
-        </Animated.View>
+        </View>
 
         <View style={styles.ctaBlock}>
           <Button

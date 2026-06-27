@@ -35,7 +35,7 @@ VALID_ASSESSMENT = {
 
 
 def _mongo():
-    return MongoClient(os.environ["MONGO_URL"])["blueprint90_test"]
+    return MongoClient(os.environ["MONGODB_URI"])["blueprint90_test"]
 
 
 def _paid_body(user_id: str, overrides: dict | None = None) -> dict:

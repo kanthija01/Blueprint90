@@ -27,7 +27,7 @@ EMERGENT_SESSION_FIXTURE = {
 
 
 def _mongo():
-    return MongoClient(os.environ["MONGO_URL"])["blueprint90_test"]
+    return MongoClient(os.environ["MONGODB_URI"])["blueprint90_test"]
 
 
 class TestSessionExchange:

@@ -29,6 +29,12 @@ _SOURCE_DB = os.environ.get("DB_NAME", "test_database")
 os.environ["DB_NAME"] = "blueprint90_test"
 os.environ.setdefault("RAZORPAY_WEBHOOK_SECRET", "whsec_test_blueprint90_local")
 
+# Tests always run against local MongoDB — never against the production Atlas
+# cluster.  Override MONGODB_URI for the test process so core/db.py connects
+# to localhost, leaving the real MONGODB_URI untouched in the environment.
+_TEST_MONGO_URL = os.environ.get("TEST_MONGO_URL", "mongodb://localhost:27017")
+os.environ["MONGODB_URI"] = _TEST_MONGO_URL
+
 import pytest  # noqa: E402
 from fastapi.testclient import TestClient  # noqa: E402
 from pymongo import MongoClient  # noqa: E402
@@ -44,7 +50,7 @@ from models.user import User  # noqa: E402
 # ---------------------------------------------------------------------------
 @pytest.fixture(scope="session", autouse=True)
 def _seed_modules_into_test_db():
-    mongo_url = os.environ["MONGO_URL"]
+    mongo_url = os.environ["MONGODB_URI"]
     client = MongoClient(mongo_url)
     src = client[_SOURCE_DB]
     dst = client["blueprint90_test"]
@@ -65,7 +71,7 @@ def _seed_modules_into_test_db():
 # ---------------------------------------------------------------------------
 @pytest.fixture(autouse=True)
 def _wipe_per_test():
-    mongo_url = os.environ["MONGO_URL"]
+    mongo_url = os.environ["MONGODB_URI"]
     db = MongoClient(mongo_url)["blueprint90_test"]
     for coll in (
         Collections.USERS,

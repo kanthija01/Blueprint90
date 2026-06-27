@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 from pymongo import MongoClient  # sync client used by the seed script only
 
-# Load backend/.env (MONGO_URL, DB_NAME). Loading here so any importer of this
+# Load backend/.env (MONGODB_URI, DB_NAME). Loading here so any importer of this
 # module gets a guaranteed-initialised environment.
 BACKEND_ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(BACKEND_ROOT / ".env")
@@ -29,7 +29,9 @@ def _require(name: str) -> str:
     return value
 
 
-MONGO_URL = _require("MONGO_URL")
+# MONGODB_URI — matches Render's built-in env var name for MongoDB Atlas.
+# Set this in your Render dashboard (or .env for local dev).
+MONGO_URL = _require("MONGODB_URI")
 DB_NAME = _require("DB_NAME")
 
 

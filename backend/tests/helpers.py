@@ -52,7 +52,7 @@ def seed_paid_payment(user_id: str, payment_id: str | None = None) -> str:
     into Mongo, then pass the payment_id to POST /api/assessments.
     """
     pid = payment_id or _mkid("pay")
-    db = MongoClient(os.environ["MONGO_URL"])["blueprint90_test"]
+    db = MongoClient(os.environ["MONGODB_URI"])["blueprint90_test"]
     db[Collections.PAYMENTS].insert_one(
         {
             "payment_id": pid,
@@ -81,7 +81,7 @@ def insert_stub_blueprint(
     No payment record is created, so PDF/detail routes will return 402
     unless a payment is separately inserted or linked.
     """
-    db = MongoClient(os.environ["MONGO_URL"])["blueprint90_test"]
+    db = MongoClient(os.environ["MONGODB_URI"])["blueprint90_test"]
     db[Collections.BLUEPRINTS].insert_one({
         "blueprint_id": blueprint_id,
         "user_id": user_id,

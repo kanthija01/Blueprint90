@@ -117,7 +117,7 @@ class TestPreAssessmentOrder:
         assert body["payment_id"].startswith("pay_")
         mock.assert_called_once()
         # blueprint_id must be NULL in DB for a pre-assessment order.
-        db = MongoClient(os.environ["MONGO_URL"])["blueprint90_test"]
+        db = MongoClient(os.environ["MONGODB_URI"])["blueprint90_test"]
         row = db[Collections.PAYMENTS].find_one({"payment_id": body["payment_id"]})
         assert row["blueprint_id"] is None
         assert row["status"] == "created"
@@ -151,7 +151,7 @@ class TestCreateOrder:
         # Insert a blueprint directly — no payment record yet — so create-order works.
         from datetime import datetime, timezone
         from pymongo import MongoClient as MC
-        db = MC(os.environ["MONGO_URL"])["blueprint90_test"]
+        db = MC(os.environ["MONGODB_URI"])["blueprint90_test"]
         bpid = "bp_order_test001"
         db[Collections.BLUEPRINTS].insert_one({
             "blueprint_id": bpid,
@@ -184,7 +184,7 @@ class TestCreateOrder:
         assert call_kwargs["receipt"] == body["payment_id"]
         assert call_kwargs["notes"]["blueprint_id"] == bpid
 
-        db2 = MongoClient(os.environ["MONGO_URL"])["blueprint90_test"]
+        db2 = MongoClient(os.environ["MONGODB_URI"])["blueprint90_test"]
         row = db2[Collections.PAYMENTS].find_one(
             {"payment_id": body["payment_id"]}, {"_id": 0}
         )
@@ -247,7 +247,7 @@ class TestWebhook:
         # Insert a raw blueprint without any payment record.
         from datetime import datetime, timezone
         from pymongo import MongoClient as MC
-        db = MC(os.environ["MONGO_URL"])["blueprint90_test"]
+        db = MC(os.environ["MONGODB_URI"])["blueprint90_test"]
         bpid = "bp_webhook_test001"
         db[Collections.BLUEPRINTS].insert_one({
             "blueprint_id": bpid,
@@ -284,7 +284,7 @@ class TestWebhook:
         assert r.status_code == 200
         assert r.json()["status"] == "ok"
 
-        db2 = MongoClient(os.environ["MONGO_URL"])["blueprint90_test"]
+        db2 = MongoClient(os.environ["MONGODB_URI"])["blueprint90_test"]
         row = db2[Collections.PAYMENTS].find_one({"payment_id": payment_id})
         assert row["status"] == "paid"
         assert row["razorpay_payment_id"] == "pay_captured01"

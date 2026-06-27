@@ -40,7 +40,7 @@ def _create_blueprint(client, user_id=_DEFAULT_USER, body=None):
 
 def _insert_paid_payment(blueprint_id: str, user_id: str = _DEFAULT_USER):
     """Insert a standalone paid payment record for PDF unlock (legacy flow)."""
-    db = MongoClient(os.environ["MONGO_URL"])["blueprint90_test"]
+    db = MongoClient(os.environ["MONGODB_URI"])["blueprint90_test"]
     db[Collections.PAYMENTS].insert_one(
         {
             "payment_id": f"pay_pdf_{blueprint_id[-8:]}",

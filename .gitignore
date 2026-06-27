@@ -90,3 +90,4 @@ memory/test_credentials.md
 android-sdk/backend/.mongo-data/journal/WiredTigerLog.0000000004
 backend/.mongo-data/journal/WiredTigerPreplog.0000000001
 backend/.mongo-data/journal/WiredTigerLog.0000000004
+backend/.mongo-data/journal/WiredTigerLog.0000000005

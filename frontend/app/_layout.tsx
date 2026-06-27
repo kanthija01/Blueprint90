@@ -26,12 +26,22 @@ export default function RootLayout() {
   }, [bootstrap]);
 
   useEffect(() => {
-    if ((loaded || error) && status !== "booting") {
+    // Hide the splash as soon as fonts are ready — do not wait for the auth
+    // bootstrap to complete (backend cold-start on Render can take several
+    // seconds, which would show a blank screen on web).
+    if (loaded || error || loaded === undefined) {
       SplashScreen.hideAsync();
     }
-  }, [loaded, error, status]);
+  }, [loaded, error]);
 
-  if (!loaded && !error) return null;
+  // Only block rendering while fonts are genuinely being loaded (Expo Go /
+  // StoreClient only — outside Expo Go the font map is always empty and
+  // useIconFonts resolves to [true, null] or [] immediately).
+  // During static export, expo-font's server build returns [] from useFonts,
+  // so `loaded` is undefined — guarding on it causes the layout to return
+  // null and the entire screen tree to be omitted from the HTML output.
+  const fontsReady = loaded === true || error != null || loaded === undefined;
+  if (!fontsReady) return null;
 
   return (
     <GestureHandlerRootView style={styles.flex}>
